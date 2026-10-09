@@ -1,0 +1,22 @@
+{
+  "name": "iot-uplink-gateway",
+  "version": "0.9.2",
+  "description": "HTTP and UDP uplink gateway for IoT devices with pluggable decryption and forwarding",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "generate:tlv-md": "node scripts/generate-tlv-markdown.js",
+    "publish:clean-tags": "bash scripts/push-clean-tags.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.12.0",
+    "pg": "^8.13.1"
+  }
+}
