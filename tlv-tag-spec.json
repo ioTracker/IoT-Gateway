@@ -1,0 +1,496 @@
+{
+  "schema_version": 4,
+  "format": "TLV",
+  "notes": [
+    "This spec is intentionally permissive. in_uplink and in_downlink are descriptive only and are not enforced by the parser.",
+    "All fields are unique unless can_repeat is true.",
+    "For type=buffer, max_length is the maximum byte length when provided.",
+    "Integer types use embedded-style names such as uint8, uint24, uint32, and int16. Parsers decode incoming integer payloads using the TLV length field; encoders use the type width.",
+    "For type=struct, fields describe fixed byte ranges within the value. Struct fields can also be virtual values derived from an earlier member with derived_from, shift_right, and mask. Decoded structs include an uppercase hexadecimal _raw field."
+  ],
+  "fields": [
+    {
+      "tag": "0x01",
+      "name": "version",
+      "category": "Protocol",
+      "type": "uint16",
+      "description": "Protocol version",
+      "example": 1,
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x02",
+      "name": "isConfirmed",
+      "category": "Control Flow",
+      "type": "bool",
+      "description": "Indication to the server if the sender opens a receive window",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7E",
+      "name": "payload",
+      "category": "Payload",
+      "type": "buffer",
+      "description": "Contains legacy encoded payload data",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1A",
+      "name": "stid",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device STID",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1B",
+      "name": "imei",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device IMEI",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x1C",
+      "name": "iccid",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device ICCID",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1d",
+      "name": "deviceVersions",
+      "category": "Device",
+      "type": "struct",
+      "length": 16,
+      "description": "16B: hwVersion(hex), stmVersion(hex), nrfVersion(hex), espVersion(hex)",
+      "fields": [
+        {
+          "name": "hwVersion",
+          "offset": 0,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "stmVersion",
+          "offset": 4,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "nrfVersion",
+          "offset": 8,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "espVersion",
+          "offset": 12,
+          "size": 4,
+          "type": "hex"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x21",
+      "name": "iv",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "96-bit AES-GCM IV",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x22",
+      "name": "cryptoMode",
+      "category": "Cryptography",
+      "type": "enum",
+      "description": "Cryptography mode",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true,
+      "enum": {
+        "0": "Plaintext",
+        "1": "AES-256 (PSK)",
+        "2": "AES-256 (PKI)"
+      }
+    },
+    {
+      "tag": "0x23",
+      "name": "signature",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "Message signature (AES GCM Auth Tag)",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x24",
+      "name": "unsyncedClock",
+      "category": "Cryptography",
+      "type": "bool",
+      "description": "Device has no confirmed timestamp",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7F",
+      "name": "encryptedMessage",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "Encrypted message payload",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true,
+      "kind": "container"
+    },
+    {
+      "tag": "0x10",
+      "name": "fCntUp",
+      "category": "Counters",
+      "type": "uint32",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x11",
+      "name": "fCntDown",
+      "category": "Counters",
+      "type": "uint32",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x15",
+      "name": "retransmitCount",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "Increased on every retransmit and reset on establish",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x13",
+      "name": "downlinkAck",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "fCntDown of ACK'ed downlink.",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x14",
+      "name": "uplinkAck",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "fCntUp of ACK'ed uplink.",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA001",
+      "name": "rat",
+      "category": "Radio",
+      "type": "enum",
+      "description": "Radio Access Technology",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false,
+      "enum": {
+        "7": "LTE-M",
+        "9": "NB-IOT"
+      }
+    },
+    {
+      "tag": "0xA002",
+      "name": "rsrp",
+      "category": "Radio",
+      "type": "int16",
+      "description": "Signal strength",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA003",
+      "name": "rsrq",
+      "category": "Radio",
+      "type": "int16",
+      "description": "Signal quality",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA004",
+      "name": "cellularStatus",
+      "category": "Radio",
+      "type": "struct",
+      "length": 19,
+      "description": "19B packed iot_cellular_status_t. Multi-byte members are big-endian; valid indicates which measurements are present.",
+      "fields": [
+        {
+          "name": "version",
+          "offset": 0,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "valid",
+          "offset": 1,
+          "size": 1,
+          "type": "bitfield",
+          "bits": [
+            {
+              "bit": 0,
+              "name": "ceregStat"
+            },
+            {
+              "bit": 1,
+              "name": "rat"
+            },
+            {
+              "bit": 2,
+              "name": "band"
+            },
+            {
+              "bit": 3,
+              "name": "earfcn"
+            },
+            {
+              "bit": 4,
+              "name": "plmn"
+            },
+            {
+              "bit": 5,
+              "name": "tac"
+            },
+            {
+              "bit": 6,
+              "name": "cellId"
+            },
+            {
+              "bit": 7,
+              "name": "cesq"
+            }
+          ]
+        },
+        {
+          "name": "ceregStat",
+          "offset": 2,
+          "size": 1,
+          "type": "enum",
+          "enum": {
+            "0": "NOT_REGISTERED",
+            "1": "REGISTERED_HOME",
+            "2": "SEARCHING",
+            "3": "REGISTRATION_DENIED",
+            "4": "UNKNOWN",
+            "5": "REGISTERED_ROAMING",
+            "90": "UICC_FAILURE"
+          }
+        },
+        {
+          "name": "rat",
+          "offset": 3,
+          "size": 1,
+          "type": "enum",
+          "enum": {
+            "0": "NOT_AVAILABLE",
+            "7": "LTE-M",
+            "9": "NB-IOT"
+          }
+        },
+        {
+          "name": "band",
+          "offset": 4,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "earfcn",
+          "offset": 5,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "mcc",
+          "offset": 7,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "mnc",
+          "offset": 9,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "tac",
+          "offset": 11,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "cellId",
+          "offset": 13,
+          "size": 4,
+          "type": "uint32"
+        },
+        {
+          "name": "cellENB",
+          "type": "uint32",
+          "derived_from": "cellId",
+          "shift_right": 8
+        },
+        {
+          "name": "cellSector",
+          "type": "uint8",
+          "derived_from": "cellId",
+          "mask": 255
+        },
+        {
+          "name": "rsrq",
+          "offset": 17,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "rsrp",
+          "offset": 18,
+          "size": 1,
+          "type": "uint8"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x8001",
+      "name": "battery",
+      "category": "Telemetry",
+      "type": "uint8",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x8002",
+      "name": "clickType",
+      "category": "Telemetry",
+      "type": "enum",
+      "description": "Click type that initiated messages",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false,
+      "enum": {
+        "0": "noClick",
+        "1": "single",
+        "2": "double",
+        "3": "long"
+      }
+    },
+    {
+      "tag": "0x8003",
+      "name": "batteryStatus",
+      "category": "Telemetry",
+      "type": "struct",
+      "length": 4,
+      "description": "4B: socDisplay(uint8), flags(bit0=lowTemp,bit1=veryLowTemp,bit2=replaceSoon,bit3=highStandbyCurrent,bit4-5=batEvalState[0=inUse,1=old,2=newBatteryEval,3=bad],bit6=esrQualityLimited,bit7=impedanceSocLimited), daysRemaining(uint16)",
+      "fields": [
+        {
+          "name": "socDisplay",
+          "offset": 0,
+          "size": 1,
+          "type": "uint8",
+          "unit": "%"
+        },
+        {
+          "name": "flags",
+          "offset": 1,
+          "size": 1,
+          "type": "bitfield",
+          "bits": [
+            {
+              "bit": 0,
+              "name": "lowTemp"
+            },
+            {
+              "bit": 1,
+              "name": "veryLowTemp"
+            },
+            {
+              "bit": 2,
+              "name": "replaceSoon"
+            },
+            {
+              "bit": 3,
+              "name": "highStandbyCurrent"
+            },
+            {
+              "bits": "4-5",
+              "name": "batEvalState",
+              "enum": {
+                "0": "inUse",
+                "1": "old",
+                "2": "newBatteryEval",
+                "3": "bad"
+              }
+            },
+            {
+              "bit": 6,
+              "name": "esrQualityLimited"
+            },
+            {
+              "bit": 7,
+              "name": "impedanceSocLimited"
+            }
+          ]
+        },
+        {
+          "name": "daysRemaining",
+          "offset": 2,
+          "size": 2,
+          "type": "uint16"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7C",
+      "name": "downlinks",
+      "category": "Downlink",
+      "type": "buffer",
+      "can_repeat": true,
+      "in_uplink": false,
+      "in_downlink": true
+    }
+  ]
+}
