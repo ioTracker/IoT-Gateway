@@ -1,0 +1,800 @@
+{
+  "schema_version": 4,
+  "format": "TLV",
+  "notes": [
+    "This spec is intentionally permissive. in_uplink and in_downlink are descriptive only and are not enforced by the parser.",
+    "All fields are unique unless can_repeat is true.",
+    "For type=buffer, max_length is the maximum byte length when provided.",
+    "Integer types use embedded-style names such as uint8, uint24, uint32, and int16. Parsers decode incoming integer payloads using the TLV length field; encoders use the type width.",
+    "For type=struct, fields describe fixed byte ranges within the value. Struct fields can also be virtual values derived from an earlier member with derived_from, shift_right, and mask. Decoded structs include an uppercase hexadecimal _raw field."
+  ],
+  "fields": [
+    {
+      "tag": "0x01",
+      "name": "version",
+      "category": "Protocol",
+      "type": "uint16",
+      "description": "Protocol version",
+      "example": 1,
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x02",
+      "name": "isConfirmed",
+      "category": "Control Flow",
+      "type": "bool",
+      "description": "Indication to the server if the sender opens a receive window",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7E",
+      "name": "payload",
+      "category": "Payload",
+      "type": "buffer",
+      "description": "Contains legacy encoded payload data",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1A",
+      "name": "stid",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device STID",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1B",
+      "name": "imei",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device IMEI",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x1C",
+      "name": "iccid",
+      "category": "Device",
+      "type": "buffer",
+      "description": "Device ICCID",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x1d",
+      "name": "deviceVersions",
+      "category": "Device",
+      "type": "struct",
+      "length": 16,
+      "description": "16B: hwVersion(hex), stmVersion(hex), nrfVersion(hex), espVersion(hex)",
+      "fields": [
+        {
+          "name": "hwVersion",
+          "offset": 0,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "stmVersion",
+          "offset": 4,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "nrfVersion",
+          "offset": 8,
+          "size": 4,
+          "type": "hex"
+        },
+        {
+          "name": "espVersion",
+          "offset": 12,
+          "size": 4,
+          "type": "hex"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x21",
+      "name": "iv",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "96-bit AES-GCM IV",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x22",
+      "name": "cryptoMode",
+      "category": "Cryptography",
+      "type": "enum",
+      "description": "Cryptography mode",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true,
+      "enum": {
+        "0": "Plaintext",
+        "1": "AES-256 (PSK)",
+        "2": "AES-256 (PKI)"
+      }
+    },
+    {
+      "tag": "0x23",
+      "name": "signature",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "Message signature (AES GCM Auth Tag)",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x24",
+      "name": "unsyncedClock",
+      "category": "Cryptography",
+      "type": "bool",
+      "description": "Device has no confirmed timestamp",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7F",
+      "name": "encryptedMessage",
+      "category": "Cryptography",
+      "type": "buffer",
+      "description": "Encrypted message payload",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true,
+      "kind": "container"
+    },
+    {
+      "tag": "0x10",
+      "name": "fCntUp",
+      "category": "Counters",
+      "type": "uint32",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x11",
+      "name": "fCntDown",
+      "category": "Counters",
+      "type": "uint32",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": true
+    },
+    {
+      "tag": "0x15",
+      "name": "retransmitCount",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "Increased on every retransmit and reset on establish",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x13",
+      "name": "downlinkAck",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "fCntDown of ACK'ed downlink.",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x14",
+      "name": "uplinkAck",
+      "category": "Counters",
+      "type": "uint32",
+      "description": "fCntUp of ACK'ed uplink.",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA001",
+      "name": "rat",
+      "category": "Radio",
+      "type": "enum",
+      "description": "Radio Access Technology",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false,
+      "enum": {
+        "7": "LTE-M",
+        "9": "NB-IOT"
+      }
+    },
+    {
+      "tag": "0xA002",
+      "name": "rsrp",
+      "category": "Radio",
+      "type": "int16",
+      "description": "Signal strength",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA003",
+      "name": "rsrq",
+      "category": "Radio",
+      "type": "int16",
+      "description": "Signal quality",
+      "can_repeat": false,
+      "in_uplink": false,
+      "in_downlink": false
+    },
+    {
+      "tag": "0xA004",
+      "name": "cellularStatus",
+      "category": "Radio",
+      "type": "struct",
+      "length": 19,
+      "description": "19B packed iot_cellular_status_t. Multi-byte members are big-endian; valid indicates which measurements are present.",
+      "fields": [
+        {
+          "name": "version",
+          "offset": 0,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "valid",
+          "offset": 1,
+          "size": 1,
+          "type": "bitfield",
+          "bits": [
+            {
+              "bit": 0,
+              "name": "ceregStat"
+            },
+            {
+              "bit": 1,
+              "name": "rat"
+            },
+            {
+              "bit": 2,
+              "name": "band"
+            },
+            {
+              "bit": 3,
+              "name": "earfcn"
+            },
+            {
+              "bit": 4,
+              "name": "plmn"
+            },
+            {
+              "bit": 5,
+              "name": "tac"
+            },
+            {
+              "bit": 6,
+              "name": "cellId"
+            },
+            {
+              "bit": 7,
+              "name": "cesq"
+            }
+          ]
+        },
+        {
+          "name": "ceregStat",
+          "offset": 2,
+          "size": 1,
+          "type": "enum",
+          "enum": {
+            "0": "NOT_REGISTERED",
+            "1": "REGISTERED_HOME",
+            "2": "SEARCHING",
+            "3": "REGISTRATION_DENIED",
+            "4": "UNKNOWN",
+            "5": "REGISTERED_ROAMING",
+            "90": "UICC_FAILURE"
+          }
+        },
+        {
+          "name": "rat",
+          "offset": 3,
+          "size": 1,
+          "type": "enum",
+          "enum": {
+            "0": "NOT_AVAILABLE",
+            "7": "LTE-M",
+            "9": "NB-IOT"
+          }
+        },
+        {
+          "name": "band",
+          "offset": 4,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "earfcn",
+          "offset": 5,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "mcc",
+          "offset": 7,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "mnc",
+          "offset": 9,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "tac",
+          "offset": 11,
+          "size": 2,
+          "type": "uint16"
+        },
+        {
+          "name": "cellId",
+          "offset": 13,
+          "size": 4,
+          "type": "uint32"
+        },
+        {
+          "name": "cellENB",
+          "type": "uint32",
+          "derived_from": "cellId",
+          "shift_right": 8
+        },
+        {
+          "name": "cellSector",
+          "type": "uint8",
+          "derived_from": "cellId",
+          "mask": 255
+        },
+        {
+          "name": "rsrq",
+          "offset": 17,
+          "size": 1,
+          "type": "uint8"
+        },
+        {
+          "name": "rsrp",
+          "offset": 18,
+          "size": 1,
+          "type": "uint8"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x8001",
+      "name": "battery",
+      "category": "Telemetry",
+      "type": "uint8",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x8002",
+      "name": "clickType",
+      "category": "Telemetry",
+      "type": "enum",
+      "description": "Click type that initiated messages",
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false,
+      "enum": {
+        "0": "noClick",
+        "1": "single",
+        "2": "double",
+        "3": "long"
+      }
+    },
+    {
+      "tag": "0x8003",
+      "name": "batteryStatus",
+      "category": "Telemetry",
+      "type": "struct",
+      "length": 4,
+      "description": "4B: socDisplay(uint8), flags(bit0=lowTemp,bit1=veryLowTemp,bit2=replaceSoon,bit3=highStandbyCurrent,bit4-5=batEvalState[0=inUse,1=old,2=newBatteryEval,3=bad],bit6=esrQualityLimited,bit7=impedanceSocLimited), daysRemaining(uint16)",
+      "fields": [
+        {
+          "name": "socDisplay",
+          "offset": 0,
+          "size": 1,
+          "type": "uint8",
+          "unit": "%"
+        },
+        {
+          "name": "flags",
+          "offset": 1,
+          "size": 1,
+          "type": "bitfield",
+          "bits": [
+            {
+              "bit": 0,
+              "name": "lowTemp"
+            },
+            {
+              "bit": 1,
+              "name": "veryLowTemp"
+            },
+            {
+              "bit": 2,
+              "name": "replaceSoon"
+            },
+            {
+              "bit": 3,
+              "name": "highStandbyCurrent"
+            },
+            {
+              "bits": "4-5",
+              "name": "batEvalState",
+              "enum": {
+                "0": "inUse",
+                "1": "old",
+                "2": "newBatteryEval",
+                "3": "bad"
+              }
+            },
+            {
+              "bit": 6,
+              "name": "esrQualityLimited"
+            },
+            {
+              "bit": 7,
+              "name": "impedanceSocLimited"
+            }
+          ]
+        },
+        {
+          "name": "daysRemaining",
+          "offset": 2,
+          "size": 2,
+          "type": "uint16"
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x8004",
+      "name": "batteryExtended",
+      "category": "Telemetry",
+      "type": "struct",
+      "length": 91,
+      "description": "91-byte version 1 value (94 bytes with header). Sent when BatteryExtendedReport=true in normal/full uplinks, encrypted or unencrypted. Excluded from bootstrap.",
+      "details": "Offsets 3–40 describe the model at payload construction. Offsets 41–90 describe the previous completed cellular measurement session and require sessionValid. A skipped ESR measurement can still produce a valid session, with the filter state left unchanged. All multibyte values are big-endian. Invalid fields are omitted from decoded JSON, with the ESR filter input represented as 0 for valid sessions with results other than 2 or 3.",
+      "fields": [
+        {
+          "name": "version",
+          "offset": 0,
+          "size": 1,
+          "type": "uint8",
+          "description": "Format version, currently 1."
+        },
+        {
+          "name": "flags",
+          "offset": 1,
+          "size": 1,
+          "type": "bitfield",
+          "description": "Session and battery model validity flags.",
+          "bits": [
+            {
+              "bit": 0,
+              "name": "sessionValid",
+              "description": "A previous completed cellular measurement session is available."
+            },
+            {
+              "bit": 1,
+              "name": "sessionVbatValid",
+              "description": "The session battery voltage measurement is valid."
+            },
+            {
+              "bit": 2,
+              "name": "acceptedEsrValid",
+              "description": "A previous cellular ESR was accepted and acceptedEsrAge is valid."
+            },
+            {
+              "bit": 3,
+              "name": "ignoreBatteryImpedance",
+              "description": "Display absolute SOC and days when set, or compensated SOC and days when clear."
+            }
+          ],
+          "reserved_bits": "4–7 (currently zero)"
+        },
+        {
+          "name": "esrResult",
+          "offset": 2,
+          "size": 1,
+          "type": "uint8",
+          "description": "ESR result code for the previous session. Requires sessionValid.",
+          "enum": {
+            "0": "noSamples",
+            "1": "noEsr",
+            "2": "accepted",
+            "3": "limited",
+            "4": "skippedContext",
+            "5": "skippedVcap",
+            "6": "skippedCurrent",
+            "7": "skippedVbatMax",
+            "8": "skippedVbatMin"
+          },
+          "enum_descriptions": {
+            "0": "No samples collected.",
+            "1": "No usable ESR value.",
+            "2": "ESR accepted.",
+            "3": "ESR accepted with limited filter input.",
+            "4": "ESR skipped due to session context.",
+            "5": "ESR skipped due to low initial supercapacitor voltage.",
+            "6": "ESR skipped due to insufficient peak current.",
+            "7": "ESR skipped because maximum battery voltage was outside the allowed range.",
+            "8": "ESR skipped due to low minimum battery voltage."
+          }
+        },
+        {
+          "name": "socAbsolute",
+          "offset": 3,
+          "size": 1,
+          "type": "uint8",
+          "unit": "0–254",
+          "description": "SOC from coulomb counting. Multiply by 100 / 254 for percent."
+        },
+        {
+          "name": "socCompensated",
+          "offset": 4,
+          "size": 1,
+          "type": "uint8",
+          "unit": "0–254",
+          "description": "Impedance-compensated SOC. Multiply by 100 / 254 for percent."
+        },
+        {
+          "name": "socAbsolutePermille",
+          "offset": 5,
+          "size": 2,
+          "type": "uint16",
+          "unit": "‰",
+          "description": "Absolute SOC (0–1000)."
+        },
+        {
+          "name": "socNowPermille",
+          "offset": 7,
+          "size": 2,
+          "type": "uint16",
+          "unit": "‰",
+          "description": "Current SOC after impedance limiting (0–1000)."
+        },
+        {
+          "name": "socEstimatedPermille",
+          "offset": 9,
+          "size": 2,
+          "type": "uint16",
+          "unit": "‰",
+          "description": "Estimated SOC with temperature compensation (0–1000)."
+        },
+        {
+          "name": "daysRemainingAbsolute",
+          "offset": 11,
+          "size": 2,
+          "type": "uint16",
+          "unit": "days",
+          "description": "Estimated life without impedance compensation. 65535 means unknown."
+        },
+        {
+          "name": "daysRemainingCompensated",
+          "offset": 13,
+          "size": 2,
+          "type": "uint16",
+          "unit": "days",
+          "description": "Estimated life with impedance compensation. 65535 means unknown."
+        },
+        {
+          "name": "chargeUsedTotal",
+          "offset": 15,
+          "size": 8,
+          "type": "uint64",
+          "unit": "mAms",
+          "description": "Total charge used. 3600000 mAms equals 1 mAh. The gateway returns a decimal string.",
+          "json_type": "decimal_string"
+        },
+        {
+          "name": "resistanceNormalized",
+          "offset": 23,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Normalized resistance used by the current model."
+        },
+        {
+          "name": "acceptedEsrAge",
+          "offset": 27,
+          "size": 4,
+          "type": "uint32",
+          "unit": "s",
+          "description": "Age of the last accepted cellular ESR measurement. Requires acceptedEsrValid."
+        },
+        {
+          "name": "modelTemperature",
+          "offset": 31,
+          "size": 2,
+          "type": "int16",
+          "unit": "°C",
+          "description": "Temperature at the last battery model evaluation."
+        },
+        {
+          "name": "esrRawMaximum",
+          "offset": 33,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Highest raw ESR since battery reset."
+        },
+        {
+          "name": "esrFilteredMaximum",
+          "offset": 37,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Highest filtered ESR since battery reset."
+        },
+        {
+          "name": "sessionUplinkCounter",
+          "offset": 41,
+          "size": 4,
+          "type": "uint32",
+          "description": "Uplink counter for session context only. It does not confirm delivery."
+        },
+        {
+          "name": "sessionDuration",
+          "offset": 45,
+          "size": 4,
+          "type": "uint32",
+          "unit": "ms",
+          "description": "Session duration."
+        },
+        {
+          "name": "sessionCharge",
+          "offset": 49,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mAms",
+          "description": "Session charge. Requires sessionSampleCount > 0."
+        },
+        {
+          "name": "sessionSampleCount",
+          "offset": 53,
+          "size": 4,
+          "type": "uint32",
+          "unit": "samples",
+          "description": "Sample count."
+        },
+        {
+          "name": "sessionVcapStart",
+          "offset": 57,
+          "size": 2,
+          "type": "uint16",
+          "unit": "mV",
+          "description": "Supercapacitor voltage at session start."
+        },
+        {
+          "name": "sessionVcapEnd",
+          "offset": 59,
+          "size": 2,
+          "type": "uint16",
+          "unit": "mV",
+          "description": "Supercapacitor voltage at session end."
+        },
+        {
+          "name": "sessionVbatMin",
+          "offset": 61,
+          "size": 2,
+          "type": "uint16",
+          "unit": "mV",
+          "description": "Minimum battery voltage. Requires sessionVbatValid."
+        },
+        {
+          "name": "sessionVbatMax",
+          "offset": 63,
+          "size": 2,
+          "type": "uint16",
+          "unit": "mV",
+          "description": "Maximum battery voltage. Requires sessionVbatValid."
+        },
+        {
+          "name": "sessionTemperature",
+          "offset": 65,
+          "size": 2,
+          "type": "int16",
+          "unit": "°C",
+          "description": "Temperature at session completion."
+        },
+        {
+          "name": "sessionCurrentAverage",
+          "offset": 67,
+          "size": 4,
+          "type": "uint32",
+          "unit": "µA",
+          "description": "Average current. Requires sessionSampleCount > 0."
+        },
+        {
+          "name": "sessionCurrentPeak",
+          "offset": 71,
+          "size": 4,
+          "type": "uint32",
+          "unit": "µA",
+          "description": "Peak current. Requires sessionSampleCount > 0."
+        },
+        {
+          "name": "sessionCurrentAtVbatMin",
+          "offset": 75,
+          "size": 4,
+          "type": "uint32",
+          "unit": "µA",
+          "description": "Current at minimum battery voltage. Requires sessionVbatValid."
+        },
+        {
+          "name": "sessionEsrRaw",
+          "offset": 79,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Raw ESR. Requires sessionVbatValid, sessionCurrentPeak > 0 and esrResult other than 1."
+        },
+        {
+          "name": "sessionEsrInput",
+          "offset": 83,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Accepted ESR filter input for esrResult 2 or 3. Otherwise 0."
+        },
+        {
+          "name": "sessionEsrFiltered",
+          "offset": 87,
+          "size": 4,
+          "type": "uint32",
+          "unit": "mΩ",
+          "description": "Filter state after the session. 0 means uninitialized."
+        }
+      ],
+      "can_repeat": false,
+      "in_uplink": true,
+      "in_downlink": false
+    },
+    {
+      "tag": "0x7C",
+      "name": "downlinks",
+      "category": "Downlink",
+      "type": "buffer",
+      "can_repeat": true,
+      "in_uplink": false,
+      "in_downlink": true
+    }
+  ]
+}
